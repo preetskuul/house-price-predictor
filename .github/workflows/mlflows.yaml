@@ -1,14 +1,15 @@
 # .github/workflows/mlops-pipeline.yml
-  name: MLOps Pipeline
-  on:
+name: MLOps Pipeline
+
+on:
   push:
     branches: [ main ]
     tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ main ]
 
-  jobs:
-    data-processing:
+jobs:
+  data-processing:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -40,6 +41,7 @@
         with:
           name: preprocessor
           path: models/trained/preprocessor.pkl
+
   model-training:
     needs: data-processing
     runs-on: ubuntu-latest
@@ -49,7 +51,7 @@
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-        python-version: '3.11.9'
+          python-version: '3.11.9'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -84,17 +86,18 @@
         run: |
           docker stop mlflow-server || true
           docker rm mlflow-server || true
-    build-and-publish:
-      needs: model-training
-      runs-on: ubuntu-latest
-      steps:
+
+  build-and-publish:
+    needs: model-training
+    runs-on: ubuntu-latest
+    steps:
         - name: Checkout code
           uses: actions/checkout@v2
         - name: Download trained model
           uses: actions/download-artifact@v4
           with:
-          name: trained-model
-          path: models/
+            name: trained-model
+            path: models/
         - name: Download preprocessor
           uses: actions/download-artifact@v4
           with:
